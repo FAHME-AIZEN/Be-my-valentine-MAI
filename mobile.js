@@ -4,8 +4,6 @@ const SCALE = 0.5;
 class Paper {
   holdingPaper = false;
 
-  startX = 0;
-  startY = 0;
   prevX = 0;
   prevY = 0;
 
@@ -15,59 +13,61 @@ class Paper {
   rotation = Math.random() * 30 - 15;
 
   init(paper) {
-    paper.style.touchAction = 'none'; // VERY important for mobile
+    paper.style.touchAction = 'none';
 
-    paper.addEventListener('touchstart', (e) => {
-      e.preventDefault();
+    paper.addEventListener(
+      'touchstart',
+      (e) => {
+        e.preventDefault();
 
-      paper.style.zIndex = highestZ++;
-      this.holdingPaper = true;
+        this.holdingPaper = true;
+        paper.style.zIndex = highestZ++;
 
-      if (e.touches.length === 1) {
         const touch = e.touches[0];
-        this.startX = touch.clientX;
-        this.startY = touch.clientY;
         this.prevX = touch.clientX;
         this.prevY = touch.clientY;
-      }
-    });
+      },
+      { passive: false }
+    );
 
-    paper.addEventListener('touchmove', (e) => {
-      if (!this.holdingPaper) return;
-      e.preventDefault();
+    paper.addEventListener(
+      'touchmove',
+      (e) => {
+        if (!this.holdingPaper) return;
+        e.preventDefault();
 
-      // 🖐 One finger → drag
-      if (e.touches.length === 1) {
-        const touch = e.touches[0];
+        // ☝️ DRAG
+        if (e.touches.length === 1) {
+          const touch = e.touches[0];
 
-        const dx = (touch.clientX - this.prevX) / SCALE;
-        const dy = (touch.clientY - this.prevY) / SCALE;
+          const dx = (touch.clientX - this.prevX) / SCALE;
+          const dy = (touch.clientY - this.prevY) / SCALE;
 
-        this.currentPaperX += dx;
-        this.currentPaperY += dy;
+          this.currentPaperX += dx;
+          this.currentPaperY += dy;
 
-        this.prevX = touch.clientX;
-        this.prevY = touch.clientY;
-      }
+          this.prevX = touch.clientX;
+          this.prevY = touch.clientY;
+        }
 
-      // ✌️ Two fingers → rotate
-      if (e.touches.length === 2) {
-        const t1 = e.touches[0];
-        const t2 = e.touches[1];
+        // ✌️ ROTATE
+        if (e.touches.length === 2) {
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
 
-        const dx = t2.clientX - t1.clientX;
-        const dy = t2.clientY - t1.clientY;
+          const dx = t2.clientX - t1.clientX;
+          const dy = t2.clientY - t1.clientY;
 
-        const angle = Math.atan2(dy, dx);
-        this.rotation = (angle * 180) / Math.PI;
-      }
+          this.rotation = Math.atan2(dy, dx) * (180 / Math.PI);
+        }
 
-      paper.style.transform = `
-        translateX(${this.currentPaperX}px)
-        translateY(${this.currentPaperY}px)
-        rotateZ(${this.rotation}deg)
-      `;
-    });
+        paper.style.transform = `
+          translate(${this.currentPaperX}px, ${this.currentPaperY}px)
+          rotate(${this.rotation}deg)
+        `;
+      },
+      { passive: false }
+    );
 
     paper.addEventListener('touchend', () => {
       this.holdingPaper = false;
@@ -75,8 +75,7 @@ class Paper {
   }
 }
 
-const papers = document.querySelectorAll('.paper');
-papers.forEach(paper => {
+document.querySelectorAll('.paper').forEach(paper => {
   const p = new Paper();
   p.init(paper);
 });
