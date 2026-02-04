@@ -18,8 +18,10 @@ class Paper {
   rotating = false;
 
   init(paper) {
-    paper.addEventListener('touchmove', (e) => {
-      e.preventDefault();
+    paper.addEventListener(
+  'touchmove',
+  (e) => {
+    e.preventDefault();
       if(!this.rotating) {
         this.touchMoveX = e.touches[0].clientX;
         this.touchMoveY = e.touches[0].clientY;
@@ -54,7 +56,8 @@ class Paper {
 
         paper.style.transform = `translateX(${this.currentPaperX}px) translateY(${this.currentPaperY}px) rotateZ(${this.rotation}deg)`;
       }
-    }) , { passive: false };
+    } , { passive: false }
+);
 
     paper.addEventListener('touchstart', (e) => {
       if(this.holdingPaper) return; 
